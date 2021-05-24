@@ -75,7 +75,7 @@ def main(argv):
                 print(str(pileupFile))
                 table = pd.read_csv(pileupFile)
                 for index, row in table.iterrows():
-                    nucs_Freq = set(["C_freq", "A_freq", "G_freq", "T_freq"])
+                    nucs_Freq = set(["C_freq", "A_freq", "G_freq", "T_freq","del_freq"])
                     ref = row["ref"]
                     nucs_Freq.remove(ref + "_freq")
                     for nuc in nucs_Freq:
