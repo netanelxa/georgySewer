@@ -71,17 +71,22 @@ def main(argv):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for pileupFile in filesList:
-            print(str(pileupFile))
-            table = pd.read_csv(pileupFile)
-            for index, row in table.iterrows():
-                nucs_Freq = set(["C_freq", "A_freq", "G_freq", "T_freq"])
-                ref = row["ref"]
-                nucs_Freq.remove(ref + "_freq")
-                for nuc in nucs_Freq:
-                    if row[nuc] > freq_threshold:
-                        region = getRegion(row["pos"] + 1, regionsList)
-                        sampleName = pileupFile.rsplit("/", 1)[1].rsplit(".")[0]
-                        writeToCSV(writer, sampleName, ref, nuc.split("_")[0], row["pos"] + 1, region[0])
+            try:
+                print(str(pileupFile))
+                table = pd.read_csv(pileupFile)
+                for index, row in table.iterrows():
+                    nucs_Freq = set(["C_freq", "A_freq", "G_freq", "T_freq"])
+                    ref = row["ref"]
+                    nucs_Freq.remove(ref + "_freq")
+                    for nuc in nucs_Freq:
+                        if row[nuc] > freq_threshold:
+                            region = getRegion(row["pos"] + 1, regionsList)
+                            sampleName = pileupFile.rsplit("/", 1)[1].rsplit(".")[0]
+                            writeToCSV(writer, sampleName, ref, nuc.split("_")[0], row["pos"] + 1, region[0])
+            except Exception as e:
+                print(e)
+                print(pileupFile.rsplit("/", 1)[1].rsplit(".")[0])
+                
     csvfile.close()
 
 
