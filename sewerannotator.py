@@ -7,17 +7,17 @@ from Bio import SeqIO
 import re
 
 
-def findMutPileupFiles(dir):
+def findMutPileupFiles(dir, lines):
     r = []
     subdirs = [x[0] for x in os.walk(dir)]
     for subdir in subdirs:
         if "mutationsPileups" in subdir:
             files = os.walk(subdir).__next__()[2]
+            files = list(set(files).intersection(lines))
             if (len(files) > 0):
                 for file in files:
                     r.append(os.path.join(subdir, file))
     return r
-
 
 def getRegion(i, regionsList):
     regionTitles = {}
@@ -63,7 +63,9 @@ def main(argv):
                             'region': row[2], 'start': row[3], 'end': row[4], 'function': row[5]})
         regionsList = my_list[1:]
     dirPath = argv
-    filesList = findMutPileupFiles(dirPath)
+    with open(r'D:\Users\user\PycharmProjects\pythonProject1\env_apr_samples.txt') as f:
+        lines = f.read().splitlines()
+    filesList = findMutPileupFiles(dirPath, lines)
     freq_threshold = 5
     fieldnames = ['Sequence ID', 'Reference Nucleotide', 'Mutation nucleotide', 'location', 'nuc name', 'protein']
 
