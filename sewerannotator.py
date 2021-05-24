@@ -63,7 +63,7 @@ def main(argv):
                             'region': row[2], 'start': row[3], 'end': row[4], 'function': row[5]})
         regionsList = my_list[1:]
     dirPath = argv
-    with open(r'D:\Users\user\PycharmProjects\pythonProject1\env_apr_samples.txt') as f:
+    with open(r'env_apr_samples.txt') as f:
         lines = f.read().splitlines()
     filesList = findMutPileupFiles(dirPath, lines)
     freq_threshold = 5
