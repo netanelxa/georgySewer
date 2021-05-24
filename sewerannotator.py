@@ -82,7 +82,7 @@ def main(argv):
                         if row[nuc] > freq_threshold:
                             region = getRegion(row["pos"] + 1, regionsList)
                             sampleName = pileupFile.rsplit("/", 1)[1].rsplit(".")[0]
-                            writeToCSV(writer, sampleName, ref, nuc.split("_")[0], row["pos"] + 1, region[0])
+                            writeToCSV(writer, sampleName, ref, nuc.split("_")[0], row["pos"], region[0])
             except Exception as e:
                 print(e)
                 print(pileupFile.rsplit("/", 1)[1].rsplit(".")[0])
