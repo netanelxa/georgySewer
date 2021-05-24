@@ -14,12 +14,8 @@ def main():
 
     freqTable=pd.DataFrame()
     freqTable['nuc name']=uniqueMuts
-    mapping = dict(all_mutations[['nuc name', 'type']].values)
-    freqTable['type'] = freqTable['nuc name'].map(mapping)
     mapping = dict(all_mutations[['nuc name', 'protein']].values)
     freqTable['protein'] = freqTable['nuc name'].map(mapping)
-    mapping = dict(all_mutations[['nuc name', 'AAMutation']].values)
-    freqTable['AAMutation'] = freqTable['nuc name'].map(mapping)
     count_title='Count ('+str(numofSequences)+')'
     freqTable[count_title]=freqTable['nuc name'].map(all_mutations['nuc name'].value_counts())
     freqTable['Freq'] = freqTable['nuc name'].map(freqs)
