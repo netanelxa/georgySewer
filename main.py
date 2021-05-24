@@ -33,5 +33,5 @@ def main():
 
 
 if __name__ == '__main__':
-    sewerannotator.main(sys.argv[1:])
+    sewerannotator.main(sys.argv[1])
     main()
