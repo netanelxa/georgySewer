@@ -27,7 +27,7 @@ def calculateFreqs(month):
     freqTable=freqTable.loc[freqTable['Freq'] >= 2]
     mapping = dict(b117muts[['nucleotide', 'lineage original']].values)
     freqTable['isUKLineage'] = freqTable['nuc name'].map(mapping)
-    freqTable.to_csv("Freq_Table_"+month+".csv, index=False)
+    freqTable.to_csv("Freq_Table"+month+".csv", index=False)
     print("Freq_Table_"+month+".csv is ready")
 
 
