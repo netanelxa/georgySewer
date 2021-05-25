@@ -3,8 +3,9 @@ import pandas as pd
 import sewerannotator
 import sys
 
-def main():
-    all_mutations = pd.read_csv("all_mutations.csv")
+
+def calculateFreqs(month):
+    all_mutations = pd.read_csv('all_mutations_'+month+'.csv')
     knownmuts = pd.read_csv("known_muts.csv")
     b117muts = pd.read_csv("b117muts.csv")
     uniqueIDs=pd.unique(all_mutations["Sequence ID"])
@@ -27,8 +28,14 @@ def main():
     mapping = dict(b117muts[['nucleotide', 'lineage original']].values)
     freqTable['isUKLineage'] = freqTable['nuc name'].map(mapping)
     freqTable.to_csv("Freq_Table.csv", index=False)
-    print("Freq_Table.csv is ready")
+    print("Freq_Table_"+month+".csv is ready")
 
+
+def main():
+    months = ["env_feb_samples.txt", "env_mar_samples.txt", "env_apr_samples.txt", "env_may_samples.txt"]
+    for month in months:
+        month_str = month.split("_")[1]
+        calculateFreqs(month_str)
 
 
 if __name__ == '__main__':

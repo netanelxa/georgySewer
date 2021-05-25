@@ -9,15 +9,17 @@ import re
 
 def findMutPileupFiles(dir, lines):
     r = []
+    a = []
     subdirs = [x[0] for x in os.walk(dir)]
     for subdir in subdirs:
         if "mutationsPileups" in subdir:
             files = os.walk(subdir).__next__()[2]
-            files=[file for file in files for record in lines if record in file]
+            files = [file for file in files for record in lines if record in file]
             if (len(files) > 0):
                 for file in files:
                     r.append(os.path.join(subdir, file))
     return r
+
 
 def getRegion(i, regionsList):
     regionTitles = {}
@@ -53,6 +55,27 @@ def writeToCSV(writer, record, refnuc, mutnuc, i, regionTitle):
                      'protein': str(regionTitle)})
 
 
+def findMutations(dirPath, lines, regionsList, month):
+    filesList = findMutPileupFiles(dirPath, lines)
+    freq_threshold = 5
+    fieldnames = ['Sequence ID', 'Reference Nucleotide', 'Mutation nucleotide', 'location', 'nuc name', 'protein']
+    with open('all_mutations_'+month+'.csv', 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for pileupFile in filesList:
+            table = pd.read_csv(pileupFile)
+            for index, row in table.iterrows():
+                nucs_Freq = set(["C_freq", "A_freq", "G_freq", "T_freq", "del_freq"])
+                ref = row["ref"]
+                nucs_Freq.remove(ref + "_freq")
+                for nuc in nucs_Freq:
+                    if row[nuc] > freq_threshold:
+                        region = getRegion(row["pos"] + 1, regionsList)
+                        sampleName = pileupFile.rsplit("\\", 1)[1].rsplit(".")[0]
+                        writeToCSV(writer, sampleName, ref, nuc.split("_")[0], row["pos"], region[0])
+    csvfile.close()
+
+
 def main(argv):
     regiontable = "regions.csv"
     with open(regiontable, 'r') as f:
@@ -62,34 +85,13 @@ def main(argv):
             my_list.append({'segment': row[0], 'id': row[1],
                             'region': row[2], 'start': row[3], 'end': row[4], 'function': row[5]})
         regionsList = my_list[1:]
-    dirPath = argv
-    with open(r'env_apr_samples.txt') as f:
-        lines = f.read().splitlines()
-    filesList = findMutPileupFiles(dirPath, lines)
-    freq_threshold = 5
-    fieldnames = ['Sequence ID', 'Reference Nucleotide', 'Mutation nucleotide', 'location', 'nuc name', 'protein']
-
-    with open('all_mutations.csv', 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        for pileupFile in filesList:
-            try:
-                print(str(pileupFile))
-                table = pd.read_csv(pileupFile)
-                for index, row in table.iterrows():
-                    nucs_Freq = set(["C_freq", "A_freq", "G_freq", "T_freq","del_freq"])
-                    ref = row["ref"]
-                    nucs_Freq.remove(ref + "_freq")
-                    for nuc in nucs_Freq:
-                        if row[nuc] > freq_threshold:
-                            region = getRegion(row["pos"] + 1, regionsList)
-                            sampleName = pileupFile.rsplit("/", 1)[1].rsplit(".")[0]
-                            writeToCSV(writer, sampleName, ref, nuc.split("_")[0], row["pos"], region[0])
-            except Exception as e:
-                print(e)
-                print(pileupFile.rsplit("/", 1)[1].rsplit(".")[0])
-                
-    csvfile.close()
+    dirPath = str(argv)
+    months = ["env_feb_samples.txt", "env_mar_samples.txt", "env_apr_samples.txt", "env_may_samples.txt"]
+    for month in months:
+        with open(month) as f:
+            month_str=month.split("_")[1]
+            lines = f.read().splitlines()
+        findMutations(dirPath, lines, regionsList, month_str)
 
 
 if __name__ == '__main__':
