@@ -13,7 +13,7 @@ def findMutPileupFiles(dir, lines):
     for subdir in subdirs:
         if "mutationsPileups" in subdir:
             files = os.walk(subdir).__next__()[2]
-            files=[x for ele in files for x in files if x in ele]
+            files=[file for file in files for record in lines if record in file]
             if (len(files) > 0):
                 for file in files:
                     r.append(os.path.join(subdir, file))
