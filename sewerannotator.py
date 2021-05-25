@@ -71,7 +71,7 @@ def findMutations(dirPath, lines, regionsList, month):
                 for nuc in nucs_Freq:
                     if row[nuc] > freq_threshold:
                         region = getRegion(row["pos"] + 1, regionsList)
-                        sampleName = pileupFile.rsplit("\\", 1)[1].rsplit(".")[0]
+                        sampleName = pileupFile.rsplit("/", 1)[1].rsplit(".")[0]
                         writeToCSV(writer, sampleName, ref, nuc.split("_")[0], row["pos"], region[0])
     csvfile.close()
 
