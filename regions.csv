@@ -1,5 +1,5 @@
 segment,id,region,start,end,function.,,
-1,UTR5,UTR5,1,265,,,ORF1ab includes all NSP
+1,UTR5,UTR5,1,265,,,ORF1ab includes all NSPs
 2,ORF1,ORF1ab,266,21555,,,
 3,ORF1a,ORF1a,266,13468,,,
 5,NSP1,NSP1,266,805,leader protein,,
