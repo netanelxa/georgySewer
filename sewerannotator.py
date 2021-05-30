@@ -186,7 +186,7 @@ def main(argv):
             month_str = month.split("_")[1]
             lines = f.read().splitlines()
         findMutations(dirPath, lines, regionsList, month_str, refSeq)
-        print("all mutations "+month+" is ready)
+        print("all mutations "+month+" table is ready)
 
 
 if __name__ == '__main__':
