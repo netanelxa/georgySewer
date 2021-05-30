@@ -169,6 +169,7 @@ def findMutations(dirPath, lines, regionsList, month, refSeq):
 
 
 def main(argv):
+    print("Starting")
     regiontable = "regions.csv"
     refSeq = list(SeqIO.parse("REF_NC_045512.2.fasta", "fasta"))[0].seq
     with open(regiontable, 'r') as f:
@@ -185,6 +186,7 @@ def main(argv):
             month_str = month.split("_")[1]
             lines = f.read().splitlines()
         findMutations(dirPath, lines, regionsList, month_str, refSeq)
+        print("all mutations "+month+" is ready)
 
 
 if __name__ == '__main__':
