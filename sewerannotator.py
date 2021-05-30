@@ -48,18 +48,19 @@ def getRegion(i, regionsList):
         return region_id, filteredregionTitles[region_id][0], filteredregionTitles[region_id][1]
 
 
-def writeToCSV(writer, record, refnuc, mutnuc, i, regionTitle):
+def writeToCSV(writer, record, refnuc, mutnuc, i, regionTitle, mutFreq):
     writer.writerow({'Sequence ID': record, 'Reference Nucleotide': refnuc,
                      'Mutation nucleotide': mutnuc, 'location': i + 1,
                      'nuc name': str(i + 1) + " " + refnuc + " -> " + mutnuc,
-                     'protein': str(regionTitle)})
+                     'protein': str(regionTitle), 'Mut_Freq': mutFreq})
 
 
 def findMutations(dirPath, lines, regionsList, month):
     filesList = findMutPileupFiles(dirPath, lines)
     freq_threshold = 5
-    fieldnames = ['Sequence ID', 'Reference Nucleotide', 'Mutation nucleotide', 'location', 'nuc name', 'protein']
-    with open('all_mutations_'+month+'.csv', 'w', newline='') as csvfile:
+    fieldnames = ['Sequence ID', 'Reference Nucleotide', 'Mutation nucleotide', 'location', 'nuc name', 'protein',
+                  'Mut_Freq']
+    with open('all_mutations_' + month + '.csv', 'w', newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for pileupFile in filesList:
@@ -71,8 +72,8 @@ def findMutations(dirPath, lines, regionsList, month):
                 for nuc in nucs_Freq:
                     if row[nuc] > freq_threshold:
                         region = getRegion(row["pos"] + 1, regionsList)
-                        sampleName = pileupFile.rsplit("/", 1)[1].rsplit(".")[0]
-                        writeToCSV(writer, sampleName, ref, nuc.split("_")[0], row["pos"], region[0])
+                        sampleName = pileupFile.rsplit("\\", 1)[1].rsplit(".")[0]
+                        writeToCSV(writer, sampleName, ref, nuc.split("_")[0], row["pos"], region[0], row[nuc])
     csvfile.close()
 
 
@@ -89,7 +90,7 @@ def main(argv):
     months = ["env_feb_samples.txt", "env_mar_samples.txt", "env_apr_samples.txt", "env_may_samples.txt"]
     for month in months:
         with open(month) as f:
-            month_str=month.split("_")[1]
+            month_str = month.split("_")[1]
             lines = f.read().splitlines()
         findMutations(dirPath, lines, regionsList, month_str)
 

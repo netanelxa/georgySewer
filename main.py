@@ -22,19 +22,24 @@ def calculateFreqs(month):
     freqTable['Known mutation'] = freqTable['nuc name'].map(mapping)
     count_title = 'Count (' + str(numofSequences) + ')'
     freqTable[count_title] = freqTable['nuc name'].map(all_mutations['nuc name'].value_counts())
-    freqTable['Freq'] = freqTable['nuc name'].map(freqs)
-    freqTable.sort_values(by=['protein', 'Freq'], ascending=False, inplace=True)
-    freqTable = freqTable.loc[freqTable['Freq'] >= 2]
+    freqTable['Percent of Total'] = freqTable['nuc name'].map(freqs)
+    if all_mutations.groupby('nuc name')['Mut_Freq']:
+        avg = all_mutations.groupby('nuc name')['Mut_Freq'].mean()
+        freqTable['Average']=freqTable['nuc name'].map(avg)
+
+    freqTable.sort_values(by=['protein', 'Percent of Total'], ascending=False, inplace=True)
+    freqTable = freqTable.loc[freqTable['Percent of Total'] >= 2]
     mapping = dict(b117muts[['nucleotide', 'lineage original']].values)
     freqTable['isUKLineage'] = freqTable['nuc name'].map(mapping)
-    num_muts = len(freqTable.index) - 1
+    num_muts = len(freqTable.index)
     if num_muts <= 0:
         num_muts = 0
-    geneFreq = freqTable['protein'].value_counts()  # + " \ " + str(num_muts)
-    geneFreq['total'] =num_muts
-    geneFreq=pd.DataFrame(geneFreq)
+    geneFreq = freqTable['protein'].value_counts()
+    geneFreq['total'] = freqTable['protein'].value_counts().sum()
+    geneFreq = pd.DataFrame(geneFreq)
     if not geneFreq.empty:
-        geneFreq['Freq'] = geneFreq / num_muts * 100
+        geneFreq['Percent of Total'] = geneFreq / num_muts * 100
+    geneFreq.rename(columns={'protein': 'Count'}, inplace=True)
 
     writer = pd.ExcelWriter("Freq_Table_" + month + ".xlsx", engine='xlsxwriter')
     freqTable.to_excel(writer, sheet_name='Mutations Frequencies', index=False)
