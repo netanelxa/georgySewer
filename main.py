@@ -42,7 +42,7 @@ def calculateFreqs(month):
 
     writer = pd.ExcelWriter("Freq_Table_" + month + ".xlsx", engine='xlsxwriter')
     try:
-        freqTable=freqTable.sort_values(by=["protein", "Average"],ascending=False)
+        freqTable=freqTable.sort_values(by=["protein", "Average","Percent of Total"],ascending=False)
     except:
         pass
     freqTable.to_excel(writer, sheet_name='Mutations Frequencies', index=False)
