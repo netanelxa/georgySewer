@@ -68,11 +68,9 @@ def translate(sequence, start, end, codon_table):
     return tranlsated
 
 
-def getTranslate(i, regionsList, referenceSequence, record, flag):
-    regionTitle, regionStart, regionEnd = getRegion(i, regionsList)
-    RefAA = translate(''.join(map(str, referenceSequence)), regionStart - 1, regionEnd,
-                      codon_map)
-    OtherSeqAA = translate(''.join(map(str, record)), regionStart - 1, regionEnd, codon_map)
+def getTranslate(i, referenceSequence, record, flag, regionStart, regionEnd):
+    RefAA = translate(referenceSequence, regionStart - 1, regionEnd, codon_map)
+    OtherSeqAA = record
     aaMutIndexr = (i + 1 - regionStart) / 3
     if aaMutIndexr % 1 == 0:
         aaMutIndex = int(aaMutIndexr + 1)
@@ -90,7 +88,7 @@ def getTranslate(i, regionsList, referenceSequence, record, flag):
             AAMutToCSv = AAMutToCSv[:-1] + "Del"
     else:
         AAMutToCSv = "None"
-    return regionTitle, AAMutToCSv
+    return AAMutToCSv
 
 
 def findMutPileupFiles(dir, lines):
@@ -134,7 +132,7 @@ def getRegion(i, regionsList):
         return region_id, filteredregionTitles[region_id][0], filteredregionTitles[region_id][1]
 
 
-def writeToCSV(writer, record, refnuc, mutnuc, i, regionTitle,AAMutToCSv, mutFreq):
+def writeToCSV(writer, record, refnuc, mutnuc, i, regionTitle, AAMutToCSv, mutFreq):
     writer.writerow({'Sequence ID': record, 'Reference Nucleotide': refnuc,
                      'Mutation nucleotide': mutnuc, 'location': i + 1,
                      'nuc name': str(i + 1) + " " + refnuc + " -> " + mutnuc,
@@ -142,6 +140,8 @@ def writeToCSV(writer, record, refnuc, mutnuc, i, regionTitle,AAMutToCSv, mutFre
 
 
 def findMutations(dirPath, lines, regionsList, month, refSeq):
+    RefAA = ''.join(map(str, refSeq))
+    OtherSeqAA = ''.join(map(str, refSeq))
     filesList = findMutPileupFiles(dirPath, lines)
     freq_threshold = 5
     fieldnames = ['Sequence ID', 'Reference Nucleotide', 'Mutation nucleotide', 'location', 'nuc name', 'protein',
@@ -157,15 +157,22 @@ def findMutations(dirPath, lines, regionsList, month, refSeq):
                 nucs_Freq.remove(ref + "_freq")
                 for nuc in nucs_Freq:
                     if row[nuc] > freq_threshold:
-                        nuc_name=nuc.split("_")[0]
-                        record = list(refSeq)
-                        record[row["pos"]] = nuc.split("_")[0]
-                        flag = 1 if nuc_name != 'del' else 2
-                        regionTitle, AAMutToCSv = getTranslate(row["pos"] + 1, regionsList, refSeq, record, flag)
-                        sampleName = pileupFile.rsplit("/", 1)[1].rsplit(".")[0]
+                        regionTitle, regionStart, regionEnd = getRegion(row["pos"] + 1, regionsList)
+                        record = list(OtherSeqAA[int(regionStart - 1):int(regionEnd)])
+                        a = row["pos"]
+                        if int(regionEnd) == 0:
+                            record = list(OtherSeqAA)
+                        record[int(row["pos"]) - int(regionStart)+1] = nuc.split("_")[0]
+                        record = translate(''.join(map(str, record)), 0, len(record), codon_map)
+                        nuc_name = nuc.split("_")[0] if nuc.split("_")[0] != "del" else "-"
+                        flag = 1 if nuc_name != '-' else 2
+                        AAMutToCSv = getTranslate(row["pos"] + 1, RefAA, record, flag, regionStart, regionEnd)
+                        sampleName = pileupFile.rsplit("\\", 1)[1].rsplit(".")[0]
                         writeToCSV(writer, sampleName, ref, nuc_name, row["pos"], regionTitle, AAMutToCSv,
                                    row[nuc])
     csvfile.close()
+
+
 
 
 def main(argv):
@@ -186,7 +193,7 @@ def main(argv):
             month_str = month.split("_")[1]
             lines = f.read().splitlines()
         findMutations(dirPath, lines, regionsList, month_str, refSeq)
-        print("all mutations "+month_str+" table is ready")
+        print("all mutations " + month_str + " is ready")
 
 
 if __name__ == '__main__':

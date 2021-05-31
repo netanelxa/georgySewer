@@ -25,7 +25,7 @@ def calculateFreqs(month):
     freqTable['Percent of Total'] = freqTable['nuc name'].map(freqs)
     if all_mutations.groupby('nuc name')['Mut_Freq']:
         avg = all_mutations.groupby('nuc name')['Mut_Freq'].mean()
-        freqTable['Average']=freqTable['nuc name'].map(avg)
+        freqTable['Average'] = freqTable['nuc name'].map(avg)
     freqTable.sort_values(by=['protein', 'Percent of Total'], ascending=False, inplace=True)
     freqTable = freqTable.loc[freqTable['Percent of Total'] >= 2]
     mapping = dict(b117muts[['nucleotide', 'lineage original']].values)
@@ -41,6 +41,10 @@ def calculateFreqs(month):
     geneFreq.rename(columns={'protein': 'Count'}, inplace=True)
 
     writer = pd.ExcelWriter("Freq_Table_" + month + ".xlsx", engine='xlsxwriter')
+    try:
+        freqTable=freqTable.sort_values(by=["protein", "Average"],ascending=False)
+    except:
+        pass
     freqTable.to_excel(writer, sheet_name='Mutations Frequencies', index=False)
     geneFreq.to_excel(writer, sheet_name='gene count')
     writer.save()
