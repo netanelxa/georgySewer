@@ -167,7 +167,7 @@ def findMutations(dirPath, lines, regionsList, month, refSeq):
                         nuc_name = nuc.split("_")[0] if nuc.split("_")[0] != "del" else "-"
                         flag = 1 if nuc_name != '-' else 2
                         AAMutToCSv = getTranslate(row["pos"] + 1, RefAA, record, flag, regionStart, regionEnd)
-                        sampleName = pileupFile.rsplit("\\", 1)[1].rsplit(".")[0]
+                        sampleName = pileupFile.rsplit("/", 1)[1].rsplit(".")[0]
                         writeToCSV(writer, sampleName, ref, nuc_name, row["pos"], regionTitle, AAMutToCSv,
                                    row[nuc])
     csvfile.close()
