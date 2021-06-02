@@ -5,6 +5,7 @@ import csv
 from Bio.Seq import Seq
 from Bio import SeqIO
 import re
+import os
 
 codon_map = {
     "TTT": "F", "TTC": "F", "TTA": "L", "TTG": "L",
@@ -177,8 +178,8 @@ def findMutations(dirPath, lines, regionsList, month, refSeq):
 
 def main(argv):
     print("Starting")
-    regiontable = "regions.csv"
-    refSeq = list(SeqIO.parse("REF_NC_045512.2.fasta", "fasta"))[0].seq
+    regiontable = os.path.dirname(os.path.abspath(__file__))+"/regions.csv"
+    refSeq = list(SeqIO.parse(os.path.dirname(os.path.abspath(__file__))+"/REF_NC_045512.2.fasta", "fasta"))[0].seq
     with open(regiontable, 'r') as f:
         reader = csv.reader(f)
         my_list = []
