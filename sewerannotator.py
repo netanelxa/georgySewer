@@ -190,7 +190,7 @@ def main(argv):
     dirPath = str(argv)
     months = ["env_feb_samples.txt", "env_mar_samples.txt", "env_apr_samples.txt", "env_may_samples.txt"]
     for month in months:
-        with open(month) as f:
+        with open( os.path.dirname(os.path.abspath(__file__)) +"/"+month) as f:
             month_str = month.split("_")[1]
             lines = f.read().splitlines()
         findMutations(dirPath, lines, regionsList, month_str, refSeq)
