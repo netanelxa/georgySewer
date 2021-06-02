@@ -2,12 +2,13 @@
 import pandas as pd
 import sewerannotator
 import sys
+import os
+
 
 
 def calculateFreqs(month):
-    all_mutations = pd.read_csv('all_mutations_' + month + '.csv')
-    knownmuts = pd.read_csv("known_muts.csv")
-    b117muts = pd.read_csv("b117muts.csv")
+    all_mutations = pd.read_csv(os.path.dirname(os.path.abspath(__file__))+'/all_mutations_' + month + '.csv')
+    b117muts = pd.read_csv(os.path.dirname(os.path.abspath(__file__))+"/b117muts.csv")
     uniqueIDs = pd.unique(all_mutations["Sequence ID"])
     uniqueMuts = pd.unique(all_mutations["nuc name"])
     numofSequences = len(uniqueIDs)
